@@ -1,6 +1,7 @@
 package daysteps
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"strconv"
@@ -20,7 +21,7 @@ const (
 func parsePackage(data string) (int, time.Duration, error) {
 	dataSlice := strings.Split(data, ",")
 	if len(dataSlice) != 2 {
-		return 0, 0, fmt.Errorf("incorrect input data for parsing")
+		return 0, 0, errors.New("incorrect input data for parsing")
 	}
 
 	steps, err := strconv.Atoi(dataSlice[0])
@@ -28,7 +29,7 @@ func parsePackage(data string) (int, time.Duration, error) {
 		return 0, 0, err
 	}
 	if steps <= 0 {
-		return 0, 0, fmt.Errorf("steps number is <=0")
+		return 0, 0, errors.New("steps number is <=0")
 	}
 
 	duration, err := time.ParseDuration(dataSlice[1])
@@ -36,7 +37,7 @@ func parsePackage(data string) (int, time.Duration, error) {
 		return 0, 0, err
 	}
 	if duration <= 0 {
-		return 0, 0, fmt.Errorf("duration is <=0")
+		return 0, 0, errors.New("duration is <=0")
 	}
 
 	return steps, duration, nil

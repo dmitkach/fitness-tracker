@@ -1,6 +1,7 @@
 package spentcalories
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"strconv"
@@ -19,25 +20,25 @@ const (
 func parseTraining(data string) (int, string, time.Duration, error) {
 	dataSlice := strings.Split(data, ",")
 	if len(dataSlice) != 3 {
-		return 0, "Шаг", 0, fmt.Errorf("incorrect data format")
+		return 0, "", 0, errors.New("incorrect data format")
 	}
 
 	steps, err := strconv.Atoi(dataSlice[0])
 	if err != nil {
-		return 0, "Шаг", 0, err
+		return 0, "", 0, err
 	}
 
 	if steps <= 0 {
-		return 0, "Шаг", 0, fmt.Errorf("steps are <=0")
+		return 0, "", 0, errors.New("steps are <=0")
 	}
 
 	duration, err := time.ParseDuration(dataSlice[2])
 	if err != nil {
-		return 0, "Шаг", 0, err
+		return 0, "", 0, err
 	}
 
 	if duration <= 0 {
-		return 0, "Шаг", 0, fmt.Errorf("duration is <=0")
+		return 0, "", 0, errors.New("duration is <=0")
 	}
 
 	activity := dataSlice[1]
@@ -97,8 +98,20 @@ func TrainingInfo(data string, weight, height float64) (string, error) {
 }
 
 func RunningSpentCalories(steps int, weight, height float64, duration time.Duration) (float64, error) {
-	if steps <= 0 || duration <= 0 || weight <= 0 || height <= 0 {
-		return 0.0, fmt.Errorf("incorrect running params")
+	if steps <= 0 {
+		return 0.0, errors.New("incorrect steps param")
+	}
+
+	if duration <= 0 {
+		return 0.0, errors.New("incorrect duration param")
+	}
+
+	if weight <= 0 {
+		return 0.0, errors.New("incorrect weight param")
+	}
+
+	if height <= 0 {
+		return 0.0, errors.New("incorrect height param")
 	}
 
 	speed := meanSpeed(steps, height, duration)
@@ -115,5 +128,5 @@ func WalkingSpentCalories(steps int, weight, height float64, duration time.Durat
 	speed := meanSpeed(steps, height, duration)
 	durationInMinutes := duration.Minutes()
 
-	return (weight * speed * durationInMinutes) / float64(minInH) * walkingCaloriesCoefficient, nil
+	return (weight * speed * durationInMinutes) / minInH * walkingCaloriesCoefficient, nil
 }
